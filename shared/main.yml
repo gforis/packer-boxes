@@ -14,12 +14,12 @@
     redhat_packages:
       - java-1.8.0-openjdk.x86_64
       - java-1.8.0-openjdk-devel.x86_64
-      - ntpd
+      - chrony
     debian_packages:
       - openjdk-8-jdk
       - ntp
     redhat_services:
-      - ntpd
+      - chronyd
     debian_services:
       - ntp
 
@@ -60,17 +60,19 @@
 
     - name: Install some helpful utilities.
       apt:
-        name: "{{ item }}"
+        name: "{{ debian_all_packages }}"
         state: latest
-      with_items: "{{ debian_all_packages }}"
       when: ansible_os_family == 'Debian'
 
     - name: Install some helpful utilities.
       yum:
-        name: "{{ item }}"
+        name: "{{ redhat_all_packages }}"
         state: latest
-      with_items: "{{ redhat_all_packages }}"
       when: ansible_os_family == 'RedHat'
+
+    - name: Disabling systemd-timesyncd
+      command: timedatectl set-ntp no
+      when: ansible_os_family == 'Debian'
 
     - name: Install services.
       service:

@@ -25,29 +25,37 @@
     - include_vars: packages.yml
     - include_vars: services.yml
 
-    - name: Merge Debian packages with common.
+    - name: Upgrade all packages.
+      yum: name=* state=latest
+      when: ansible_os_family == 'RedHat'
+
+    - name: Upgrade all packages.
+      apt: name=* state=latest
+      when: ansible_os_family == 'Debian'
+
+    - name: Merge packages with common.
       set_fact:
         debian_all_packages: "{{ common_packages + debian_packages }}"
 
-    - name: Merge RedHat packages with common.
+    - name: Merge packages with common.
       set_fact:
         redhat_all_packages: "{{ common_packages + redhat_packages }}"
 
-    - name: Install some helpful utilities for Debian.
+    - name: Install some helpful utilities.
       apt:
         name: "{{ item }}"
         state: present
       with_items: "{{ debian_all_packages }}"
       when: ansible_os_family == 'Debian'
 
-    - name: Install some helpful utilities for RedHat.
+    - name: Install some helpful utilities.
       yum:
         name: "{{ item }}"
         state: present
       with_items: "{{ redhat_all_packages }}"
       when: ansible_os_family == 'RedHat'
 
-    - name: Install services for Debian.
+    - name: Install services.
       service:
         name: "{{ item }}"
         state: started
@@ -55,7 +63,7 @@
       with_items: "{{ debian_services }}"
       when: ansible_os_family == 'Debian'
 
-    - name: Install services for RedHat.
+    - name: Install services.
       service:
         name: "{{ item }}"
         state: started

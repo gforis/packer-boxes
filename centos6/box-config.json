@@ -64,7 +64,7 @@
       },
       {
         "type": "vagrant-cloud",
-        "box_tag": "geerlingguy/centos6",
+        "box_tag": "gabor_foris/centos6",
         "version": "{{user `version`}}"
       }
     ]

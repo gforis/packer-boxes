@@ -22,12 +22,43 @@
       when: ansible_os_family == 'Debian'
 
   tasks:
-    - name: Install some helpful utilities.
+    - include_vars: packages.yml
+    - include_vars: services.yml
+
+    - name: Merge Debian packages with common.
+      set_fact:
+        debian_all_packages: "{{ common_packages + debian_packages }}"
+
+    - name: Merge RedHat packages with common.
+      set_fact:
+        redhat_all_packages: "{{ common_packages + redhat_packages }}"
+
+    - name: Install some helpful utilities for Debian.
       apt:
-        name:
-          - git
-          - wget
-          - curl
-          - vim
+        name: "{{ item }}"
         state: present
+      with_items: "{{ debian_all_packages }}"
       when: ansible_os_family == 'Debian'
+
+    - name: Install some helpful utilities for RedHat.
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ redhat_all_packages }}"
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install services for Debian.
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items: "{{ debian_services }}"
+      when: ansible_os_family == 'Debian'
+
+    - name: Install services for RedHat.
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items: "{{ redhat_services }}"
+      when: ansible_os_family == 'RedHat'

@@ -1,0 +1,17 @@
+common_packages:
+  - git
+  - wget
+  - curl
+  - vim
+  - unzip
+  - jq
+  - maven
+
+redhat_packages:
+  - java-1.8.0-openjdk.x86_64
+  - java-1.8.0-openjdk-devel.x86_64
+  - ntpd
+
+debian_packages:
+  - openjdk-8-jdk
+  - ntp

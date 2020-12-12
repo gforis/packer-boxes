@@ -1,5 +1,0 @@
-redhat_services:
-  - ntpd
-
-debian_services:
-  - ntp

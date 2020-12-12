@@ -2,6 +2,26 @@
 - hosts: all
   become: yes
   gather_facts: yes
+  vars:
+    common_packages:
+      - git
+      - wget
+      - curl
+      - vim
+      - unzip
+      - jq
+      - maven
+    redhat_packages:
+      - java-1.8.0-openjdk.x86_64
+      - java-1.8.0-openjdk-devel.x86_64
+      - ntpd
+    debian_packages:
+      - openjdk-8-jdk
+      - ntp
+    redhat_services:
+      - ntpd
+    debian_services:
+      - ntp
 
   pre_tasks:
     - name: Ensure Ansible dependencies are installed (CentOS 6).
@@ -22,9 +42,6 @@
       when: ansible_os_family == 'Debian'
 
   tasks:
-    - include_vars: packages.yml
-    - include_vars: services.yml
-
     - name: Upgrade all packages.
       yum: name=* state=latest
       when: ansible_os_family == 'RedHat'
@@ -44,14 +61,14 @@
     - name: Install some helpful utilities.
       apt:
         name: "{{ item }}"
-        state: present
+        state: latest
       with_items: "{{ debian_all_packages }}"
       when: ansible_os_family == 'Debian'
 
     - name: Install some helpful utilities.
       yum:
         name: "{{ item }}"
-        state: present
+        state: latest
       with_items: "{{ redhat_all_packages }}"
       when: ansible_os_family == 'RedHat'
 

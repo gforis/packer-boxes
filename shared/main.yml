@@ -62,3 +62,54 @@
         enabled: yes
       with_items: "{{ redhat_services }}"
       when: ansible_os_family == 'RedHat'
+
+    - name: Ensure SELinux is disabled.
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: SELINUX=disabled
+      when: ansible_os_family == 'RedHat'
+
+    - name: Setting swappiness.
+      lineinfile:
+        path: /etc/sysctl.conf
+        line: 'vm.swappiness=0'
+      when: ansible_os_family == 'RedHat'
+
+    - name: Setting overcommit memory.
+      lineinfile:
+        path: /etc/sysctl.conf
+        line: 'vm.overcommit_memory=1'
+      when: ansible_os_family == 'RedHat'
+
+    - name: Remove touch from rclocal.
+      lineinfile:
+        state: absent
+        path: /etc/rc.local
+        line: 'touch /var/lock/subsys/local'
+      when: ansible_os_family == 'RedHat'
+
+    - name: Handling Transparent Huge pages defrag.
+      lineinfile:
+        path: /etc/rc.local
+        line: 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+      when: ansible_os_family == 'RedHat'
+
+    - name: Handling Transparent Huge pages enabling.
+      lineinfile:
+        path: /etc/rc.local
+        line: 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+      when: ansible_os_family == 'RedHat'
+
+    - name: Add back touch to rclocal.
+      lineinfile:
+        state: present
+        path: /etc/rc.local
+        line: 'touch /var/lock/subsys/local'
+      when: ansible_os_family == 'RedHat'
+
+    - name: Making rclocal executable.
+      file:
+        path: /etc/rc.d/rc.local
+        mode: "u=rwx,g=rx,o=rx"
+
